@@ -3,5 +3,5 @@ import scapy.all as scapy
 def scan(ip):
     scapy.arping(ip)
 
-scan("192.x.x.1/24") #Ingresamos IP /24
-
+#sudo route -n
+scan("192.168.x.x/24") #Ingresamos IP /24
